@@ -104,6 +104,15 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     @Transactional
     public Result<JSONObject> delete(Integer id) {
 
+        //删除规格组之前需要先判断一下当前规格组下是否有规格参数
+        //true : 不能被删除
+        //false ：删除
+
+        Example example = new Example(SpecParamEntity.class);
+        example.createCriteria().andEqualTo("groupId",id);
+
+        List<SpecParamEntity> specParamEntities = specParamMapper.selectByExample(example);
+        if (specParamEntities.size() >= 1) return this.setResultError("该规格组下有规格参数,无法删除");
 
         specificationMapper.deleteByPrimaryKey(id);
 
