@@ -4,10 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.tencent.shop.base.BaseApiService;
 import com.tencent.shop.base.Result;
 import com.tencent.shop.dto.SpecGroupDTO;
+import com.tencent.shop.dto.SpecParamDTO;
 import com.tencent.shop.entity.SpecGroupEntity;
-import com.tencent.shop.mapper.SpecificationMapper;
+import com.tencent.shop.entity.SpecParamEntity;
+import com.tencent.shop.mapper.SpecGroupMapper;
+import com.tencent.shop.mapper.SpecParamMapper;
 import com.tencent.shop.service.SpecificationService;
 import com.tencent.shop.utils.TencentBeanUtil;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
@@ -25,7 +29,47 @@ import java.util.List;
 public class SpecificationServiceImpl extends BaseApiService implements SpecificationService {
 
     @Resource
-    private SpecificationMapper specificationMapper;
+    private SpecGroupMapper specificationMapper;
+
+    @Resource
+    private SpecParamMapper specParamMapper;
+
+    @Override
+    @Transactional
+    public Result<JSONObject> deleteSpecParamById(Integer id) {
+
+        specParamMapper.deleteByPrimaryKey(id);
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    @Transactional
+    public Result<JSONObject> editSpecParam(SpecParamDTO specParamDTO) {
+
+        specParamMapper.updateByPrimaryKeySelective(TencentBeanUtil.copyProperties(specParamDTO,SpecParamEntity.class));
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    @Transactional
+    public Result<JSONObject> saveSpecParam(SpecParamDTO specParamDTO) {
+
+        specParamMapper.insertSelective(TencentBeanUtil.copyProperties(specParamDTO,SpecParamEntity.class));
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<List<SpecParamEntity>> list(SpecParamDTO specParamDTO) {
+
+        Example example = new Example(SpecParamEntity.class);
+        example.createCriteria().andEqualTo("groupId",specParamDTO.getGroupId());
+        List<SpecParamEntity> specParamEntities = specParamMapper.selectByExample(example);
+
+        return this.setResultSuccess(specParamEntities);
+    }
 
     @Override
     public Result<List<SpecGroupEntity>> list(SpecGroupDTO specGroupDTO) {
@@ -39,6 +83,7 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     }
 
     @Override
+    @Transactional
     public Result<JSONObject> save(SpecGroupDTO specGroupDTO) {
 
         specificationMapper.insertSelective(TencentBeanUtil.copyProperties(specGroupDTO,SpecGroupEntity.class));
@@ -47,6 +92,7 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     }
 
     @Override
+    @Transactional
     public Result<JSONObject> edit(SpecGroupDTO specGroupDTO) {
 
         specificationMapper.updateByPrimaryKeySelective(TencentBeanUtil.copyProperties(specGroupDTO,SpecGroupEntity.class));
@@ -55,7 +101,9 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     }
 
     @Override
+    @Transactional
     public Result<JSONObject> delete(Integer id) {
+
 
         specificationMapper.deleteByPrimaryKey(id);
 

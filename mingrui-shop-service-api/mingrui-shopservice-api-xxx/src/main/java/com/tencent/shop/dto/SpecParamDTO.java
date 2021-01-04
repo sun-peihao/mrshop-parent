@@ -37,7 +37,7 @@ public class SpecParamDTO {
 
     @ApiModelProperty(name = "是否是数字类型参数,1->true 0->false",example = "0")
     @NotNull(message = "是否是数字类型参数不能为空",groups = {MingruiOperation.Update.class,MingruiOperation.Add.class})
-    private Integer numeric;
+    private Boolean numeric;
 
     @ApiModelProperty(name = "数字类型参数的单位",example = "1")
     @NotNull(message = "数字类型参数的单位不能为空",groups = {MingruiOperation.Update.class,MingruiOperation.Add.class})
@@ -45,11 +45,11 @@ public class SpecParamDTO {
 
     @ApiModelProperty(name = "是否是sku通用属性，1-》true 0-》false",example = "0")
     @NotNull(message = "是否是sku通用属性不能为空",groups = {MingruiOperation.Update.class,MingruiOperation.Add.class})
-    private Integer generic;
+    private Boolean generic;
 
     @ApiModelProperty(name = "是否用于搜索过滤，1-》true 0-》false",example = "0")
     @NotNull(message = "是否是sku通用属性不能为空",groups = {MingruiOperation.Update.class,MingruiOperation.Add.class})
-    private Integer searching;
+    private Boolean searching;
 
     @ApiModelProperty(value = "数值类型参数，如果需要搜索，则添加分段间隔值，如CPU频率间隔：0.5-1.0")
     private String segments;

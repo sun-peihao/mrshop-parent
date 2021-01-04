@@ -10,5 +10,5 @@ import tk.mybatis.mapper.common.Mapper;
  * @Date 2021/1/4
  * @Version V1.0
  **/
-public interface SpecificationMapper extends Mapper<SpecGroupEntity> {
+public interface SpecGroupMapper extends Mapper<SpecGroupEntity> {
 }

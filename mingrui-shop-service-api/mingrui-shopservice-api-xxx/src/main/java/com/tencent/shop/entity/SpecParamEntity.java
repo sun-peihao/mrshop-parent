@@ -2,6 +2,7 @@ package com.tencent.shop.entity;
 
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -25,13 +26,14 @@ public class SpecParamEntity {
 
     private String name;
 
-    private Integer numeric;
+    @Column(name = "`numeric`")
+    private Boolean numeric;
 
     private String unit;
 
-    private Integer generic;
+    private Boolean generic;
 
-    private Integer searching;
+    private Boolean searching;
 
     private String segments;
 
