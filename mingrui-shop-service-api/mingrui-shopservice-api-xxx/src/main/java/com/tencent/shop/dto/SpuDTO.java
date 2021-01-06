@@ -61,4 +61,8 @@ public class SpuDTO extends BaseDTO {
     @ApiModelProperty(value = "最后修改时间")
     private Date lastUpdateTime;
 
+    private String categoryName;
+
+    private String brandName;
+
 }
