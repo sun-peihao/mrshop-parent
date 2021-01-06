@@ -30,14 +30,18 @@ public interface BrandService {
 
     @ApiOperation(value = "新增品牌")
     @PostMapping(value = "brand/save")
-    public Result<JSONObject> save(@RequestBody BrandDTO brandDTO);
+    Result<JSONObject> save(@RequestBody BrandDTO brandDTO);
 
     @ApiOperation(value = "修改品牌")
     @PutMapping(value = "brand/save")
-    public Result<JSONObject> editBrand(@RequestBody BrandDTO brandDTO);
+    Result<JSONObject> editBrand(@RequestBody BrandDTO brandDTO);
 
     @ApiOperation(value = "删除品牌")
     @DeleteMapping(value = "brand/delBrand")
-    public Result<JSONObject> deleteBrand(Integer brandId);
+    Result<JSONObject> deleteBrand(Integer brandId);
+
+    @ApiOperation(value = "获取品牌信息")
+    @GetMapping(value = "brand/getBrandInfoByCategoryId")
+    Result<PageInfo<BrandEntity>> getBrandInfoByCategoryId(Integer cid);
 
 }

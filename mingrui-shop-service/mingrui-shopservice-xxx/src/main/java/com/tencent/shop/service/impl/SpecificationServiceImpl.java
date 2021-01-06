@@ -10,6 +10,7 @@ import com.tencent.shop.entity.SpecParamEntity;
 import com.tencent.shop.mapper.SpecGroupMapper;
 import com.tencent.shop.mapper.SpecParamMapper;
 import com.tencent.shop.service.SpecificationService;
+import com.tencent.shop.utils.ObjectUtil;
 import com.tencent.shop.utils.TencentBeanUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,7 +66,14 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     public Result<List<SpecParamEntity>> list(SpecParamDTO specParamDTO) {
 
         Example example = new Example(SpecParamEntity.class);
-        example.createCriteria().andEqualTo("groupId",specParamDTO.getGroupId());
+        Example.Criteria criteria = example.createCriteria();
+
+        if (ObjectUtil.isNotNull(specParamDTO.getGroupId()))
+            criteria.andEqualTo("groupId",specParamDTO.getGroupId());
+
+        if (ObjectUtil.isNotNull(specParamDTO.getCid()))
+            criteria.andEqualTo("cid",specParamDTO.getCid());
+
         List<SpecParamEntity> specParamEntities = specParamMapper.selectByExample(example);
 
         return this.setResultSuccess(specParamEntities);
