@@ -4,17 +4,17 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tencent.shop.base.BaseApiService;
 import com.tencent.shop.base.Result;
+import com.tencent.shop.dto.SkuDTO;
 import com.tencent.shop.dto.SpuDTO;
-import com.tencent.shop.entity.BrandEntity;
-import com.tencent.shop.entity.CategoryEntity;
-import com.tencent.shop.entity.SpuEntity;
-import com.tencent.shop.mapper.BrandMapper;
-import com.tencent.shop.mapper.CategoryMapper;
-import com.tencent.shop.mapper.SpuMapper;
+import com.tencent.shop.dto.SpuDetailDTO;
+import com.tencent.shop.entity.*;
+import com.tencent.shop.mapper.*;
 import com.tencent.shop.service.GoodsService;
 import com.tencent.shop.status.HTTPStatus;
+import com.tencent.shop.utils.JSONUtil;
 import com.tencent.shop.utils.ObjectUtil;
 import com.tencent.shop.utils.TencentBeanUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
@@ -22,6 +22,7 @@ import tk.mybatis.mapper.entity.Example;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,11 +45,25 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Resource
     private CategoryMapper categoryMapper;
 
+    @Resource
+    private SkuMapper skuMapper;
+
+    @Resource
+    private SpuDetailMapper spuDetailMapper;
+
+    @Resource
+    private StockMapper stockMapper;
+
+
     @Override
     public Result<List<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
 
-        if (ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows())){
+        if (ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows())) {
             PageHelper.startPage(spuDTO.getPage(),spuDTO.getRows());
+        }
+
+        if (!StringUtils.isEmpty(spuDTO.getSort()) && !StringUtils.isEmpty(spuDTO.getOrder())) {
+            PageHelper.orderBy(spuDTO.getOrderBy());
         }
 
         Example example = new Example(SpuEntity.class);
@@ -102,5 +117,41 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         PageInfo<SpuEntity> spuEntityPageInfo = new PageInfo<>(spuEntities);
 
         return this.setResult(HTTPStatus.OK,spuEntityPageInfo.getTotal() + "",spuDTOList);
+    }
+
+    @Override
+    public Result<JSONUtil> saveGoods(SpuDTO spuDTO) {
+        //spu
+        final Date date = new Date();
+        SpuEntity spuEntity = TencentBeanUtil.copyProperties(spuDTO, SpuEntity.class);
+        spuEntity.setSaleable(1);
+        spuEntity.setValid(1);
+        spuEntity.setCreateTime(date);
+        spuEntity.setLastUpdateTime(date);
+        spuMapper.insertSelective(spuEntity);
+
+        //spuDetail
+        SpuDetailDTO spuDetail = spuDTO.getSpuDetail();
+        SpuDetailEntity spuDetailEntity = TencentBeanUtil.copyProperties(spuDetail, SpuDetailEntity.class);
+        spuDetailEntity.setSpuId(spuEntity.getId());
+        spuDetailMapper.insertSelective(spuDetailEntity);
+
+        //sku
+        List<SkuDTO> skus = spuDTO.getSkus();
+        skus.stream().forEach(skuDTO -> {
+            SkuEntity skuEntity = TencentBeanUtil.copyProperties(skuDTO, SkuEntity.class);
+            skuEntity.setSpuId(spuEntity.getId());
+            skuEntity.setCreateTime(date);
+            skuEntity.setLastUpdateTime(date);
+            skuMapper.insertSelective(skuEntity);
+
+            //stock
+            StockEntity stockEntity = new StockEntity();
+            stockEntity.setSkuId(skuEntity.getId());
+            stockEntity.setStock(skuDTO.getStock());
+            stockMapper.insertSelective(stockEntity);
+        });
+
+        return this.setResultSuccess();
     }
 }
