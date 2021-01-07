@@ -2,6 +2,7 @@ package com.tencent.shop.service;
 
 import com.github.pagehelper.PageInfo;
 import com.tencent.shop.base.Result;
+import com.tencent.shop.dto.SkuDTO;
 import com.tencent.shop.dto.SpuDTO;
 import com.tencent.shop.entity.SpuEntity;
 import com.tencent.shop.utils.JSONUtil;
@@ -31,4 +32,11 @@ public interface GoodsService {
     @PostMapping(value = "goods/save")
     Result<JSONUtil> saveGoods(@RequestBody SpuDTO spuDTO);
 
+    @ApiOperation(value = "通过spuid获取spuDetail信息")
+    @GetMapping(value = "goods/getSpuDetailBySpuId")
+    Result<List<SpuEntity>> getSpuDetailBySpuId(Integer spuId);
+
+    @ApiOperation(value = "通过spuid获取sku信息")
+    @GetMapping(value = "goods/getSkuBySpuId")
+    Result<List<SkuDTO>> getSkuBySpuId(Integer spuId);
 }

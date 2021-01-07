@@ -15,6 +15,7 @@ import com.tencent.shop.utils.JSONUtil;
 import com.tencent.shop.utils.ObjectUtil;
 import com.tencent.shop.utils.TencentBeanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
@@ -54,6 +55,20 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Resource
     private StockMapper stockMapper;
 
+    @Override
+    public Result<List<SkuDTO>> getSkuBySpuId(Integer spuId) {
+        List<SkuDTO> list = skuMapper.getSkuBySpuId(spuId);
+
+        return this.setResultSuccess(list);
+    }
+
+    @Override
+    public Result<List<SpuEntity>> getSpuDetailBySpuId(Integer spuId) {
+
+        SpuDetailEntity spuDetailEntity = spuDetailMapper.selectByPrimaryKey(spuId);
+
+        return this.setResultSuccess(spuDetailEntity);
+    }
 
     @Override
     public Result<List<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
@@ -120,6 +135,7 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     }
 
     @Override
+    @Transactional
     public Result<JSONUtil> saveGoods(SpuDTO spuDTO) {
         //spu
         final Date date = new Date();
