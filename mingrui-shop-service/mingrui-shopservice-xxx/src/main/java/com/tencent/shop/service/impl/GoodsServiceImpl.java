@@ -56,6 +56,68 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     private StockMapper stockMapper;
 
     @Override
+    @Transactional
+    public Result<JSONUtil> downGoods(SpuDTO spuDTO) {
+
+        SpuEntity spuEntity = TencentBeanUtil.copyProperties(spuDTO, SpuEntity.class);
+        if (spuEntity.getSaleable() == 1){
+            spuEntity.setSaleable(0);
+        }else{
+            spuEntity.setSaleable(1);
+        }
+
+        spuMapper.updateByPrimaryKeySelective(spuEntity);
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    @Transactional
+    public Result<JSONUtil> deleteGoods(Integer spuId) {
+
+        //spu
+        spuMapper.deleteByPrimaryKey(spuId);
+
+        //spuDetail
+        spuDetailMapper.deleteByPrimaryKey(spuId);
+
+        Example example = new Example(SkuEntity.class);
+        example.createCriteria().andEqualTo("spuId",spuId);
+        List<SkuEntity> skuEntities = skuMapper.selectByExample(example);
+        List<Long> skuId = skuEntities.stream().map(skuEntity -> skuEntity.getId()).collect(Collectors.toList());
+        skuMapper.deleteByIdList(skuId);
+        stockMapper.deleteByIdList(skuId);
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    @Transactional
+    public Result<JSONUtil> editGoods(SpuDTO spuDTO) {
+
+        final Date date = new Date();
+        //spu
+        SpuEntity spuEntity = TencentBeanUtil.copyProperties(spuDTO, SpuEntity.class);
+        spuEntity.setLastUpdateTime(date);
+        spuMapper.updateByPrimaryKeySelective(spuEntity);
+
+        //spuDetail
+        SpuDetailEntity spuDetailEntity = TencentBeanUtil.copyProperties(spuDTO.getSpuDetail(), SpuDetailEntity.class);
+        spuDetailMapper.updateByPrimaryKeySelective(spuDetailEntity);
+
+        //skus and stock
+        Example example = new Example(SkuEntity.class);
+        example.createCriteria().andEqualTo("spuId",spuEntity.getId());
+        List<SkuEntity> skuEntities = skuMapper.selectByExample(example);
+        List<Long> skuId = skuEntities.stream().map(skuEntity -> skuEntity.getId()).collect(Collectors.toList());
+        skuMapper.deleteByIdList(skuId);
+        stockMapper.deleteByIdList(skuId);
+        this.saveSkusAndStock(spuDTO,spuEntity.getId(),date);
+
+        return this.setResultSuccess();
+    }
+
+    @Override
     public Result<List<SkuDTO>> getSkuBySpuId(Integer spuId) {
         List<SkuDTO> list = skuMapper.getSkuBySpuId(spuId);
 
@@ -153,10 +215,16 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         spuDetailMapper.insertSelective(spuDetailEntity);
 
         //sku
+        this.saveSkusAndStock(spuDTO,spuEntity.getId(),date);
+
+        return this.setResultSuccess();
+    }
+
+    private void saveSkusAndStock(SpuDTO spuDTO,Integer spuId,Date date){
         List<SkuDTO> skus = spuDTO.getSkus();
         skus.stream().forEach(skuDTO -> {
             SkuEntity skuEntity = TencentBeanUtil.copyProperties(skuDTO, SkuEntity.class);
-            skuEntity.setSpuId(spuEntity.getId());
+            skuEntity.setSpuId(spuId);
             skuEntity.setCreateTime(date);
             skuEntity.setLastUpdateTime(date);
             skuMapper.insertSelective(skuEntity);
@@ -167,7 +235,5 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
             stockEntity.setStock(skuDTO.getStock());
             stockMapper.insertSelective(stockEntity);
         });
-
-        return this.setResultSuccess();
     }
 }

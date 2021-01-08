@@ -1,9 +1,12 @@
 package com.tencent.shop.dto;
 
+import com.tencent.shop.validate.group.MingruiOperation;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -18,18 +21,22 @@ import java.util.Date;
 public class SkuDTO {
 
     @ApiModelProperty(value = "sku id",example = "1")
+    @NotNull(message = "sku id不能为空",groups = {MingruiOperation.Update.class})
     private Long skuId;
 
     @ApiModelProperty(value = "spu id",example = "1")
+    @NotNull(message = "spu id不能为空",groups = {MingruiOperation.Update.class})
     private Integer spuId;
 
     @ApiModelProperty(value = "商品标题")
+    @NotEmpty(message = "商品标题不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private String title;
 
     @ApiModelProperty(value = "商品的图片，多个图片以‘,’分割")
     private String images;
 
     @ApiModelProperty(value = "销售价格，单位为分",example = "1")
+    @NotNull(message = "销售价格不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private Integer price;
 
     @ApiModelProperty(value = "特有规格属性在spu属性模板中的对应下标组合")
@@ -39,12 +46,15 @@ public class SkuDTO {
     private String ownSpec;
 
     @ApiModelProperty(value = "是否有效，0无效，1有效",example = "1")
+    @NotNull(message = "是否有效不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private Boolean enable;
 
     @ApiModelProperty(value = "添加时间")
+    @NotNull(message = "添加时间不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private Date createTime;
 
     @ApiModelProperty(value = "最后修改时间")
+    @NotNull(message = "最后修改时间不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private Date lastUpdateTime;
 
     @ApiModelProperty(value = "库存")

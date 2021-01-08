@@ -31,7 +31,7 @@ public class SpecParamDTO {
     @NotNull(message = "规格组id不能为空",groups = {MingruiOperation.Update.class,MingruiOperation.Add.class})
     private Integer groupId;
 
-    @ApiModelProperty(name = "参数名",example = "1")
+    @ApiModelProperty(name = "参数名")
     @NotEmpty(message = "参数名不能为空",groups = {MingruiOperation.Update.class,MingruiOperation.Add.class})
     private String name;
 
@@ -40,7 +40,6 @@ public class SpecParamDTO {
     private Boolean numeric;
 
     @ApiModelProperty(name = "数字类型参数的单位",example = "1")
-    @NotNull(message = "数字类型参数的单位不能为空",groups = {MingruiOperation.Update.class,MingruiOperation.Add.class})
     private String unit;
 
     @ApiModelProperty(name = "是否是sku通用属性，1-》true 0-》false",example = "0")

@@ -21,15 +21,18 @@ import javax.validation.constraints.NotNull;
 public class SpuDetailDTO {
 
     @ApiModelProperty(value = "spu主键",example = "1")
+    @NotNull(message = "spu主键不能为空",groups = {MingruiOperation.Update.class})
     private Integer spuId;
 
     @ApiModelProperty(value = "商品描述信息")
     private String description;
 
     @ApiModelProperty(value = "通用规格参数数据")
+    @NotEmpty(message = "通用规格参数数据不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private String genericSpec;
 
     @ApiModelProperty(value = "特有规格参数及可选值信息，json格式")
+    @NotEmpty(message = "特有规格参数及可选值信息不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private String specialSpec;
 
     @ApiModelProperty(value = "包装清单")

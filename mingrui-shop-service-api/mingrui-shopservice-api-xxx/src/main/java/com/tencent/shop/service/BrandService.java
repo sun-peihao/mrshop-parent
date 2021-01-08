@@ -30,11 +30,11 @@ public interface BrandService {
 
     @ApiOperation(value = "新增品牌")
     @PostMapping(value = "brand/save")
-    Result<JSONObject> save(@RequestBody BrandDTO brandDTO);
+    Result<JSONObject> save(@Validated({MingruiOperation.Add.class}) @RequestBody BrandDTO brandDTO);
 
     @ApiOperation(value = "修改品牌")
     @PutMapping(value = "brand/save")
-    Result<JSONObject> editBrand(@RequestBody BrandDTO brandDTO);
+    Result<JSONObject> editBrand(@Validated({MingruiOperation.Update.class}) @RequestBody BrandDTO brandDTO);
 
     @ApiOperation(value = "删除品牌")
     @DeleteMapping(value = "brand/delBrand")

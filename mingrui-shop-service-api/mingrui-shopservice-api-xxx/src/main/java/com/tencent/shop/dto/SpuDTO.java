@@ -23,7 +23,7 @@ import java.util.List;
 public class SpuDTO extends BaseDTO {
 
     @ApiModelProperty(value = "主键")
-    @NotNull(message = "主键不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
+    @NotNull(message = "主键不能为空",groups = {MingruiOperation.Update.class})
     private Integer id;
 
     @ApiModelProperty(value = "标题")
@@ -31,7 +31,6 @@ public class SpuDTO extends BaseDTO {
     private String title;
 
     @ApiModelProperty(value = "子标题")
-    @NotEmpty(message = "子标题不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private String subTitle;
 
     @ApiModelProperty(value = "1级类目id")
@@ -51,9 +50,11 @@ public class SpuDTO extends BaseDTO {
     private Integer brandId;
 
     @ApiModelProperty(value = "是否上架，0下架，1上架")
+    @NotNull(message = "是否上架不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private Integer saleable;
 
     @ApiModelProperty(value = "是否有效，0已删除，1有效")
+    @NotNull(message = "是否有效不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private Integer valid;
 
     @ApiModelProperty(value = "创建时间")
