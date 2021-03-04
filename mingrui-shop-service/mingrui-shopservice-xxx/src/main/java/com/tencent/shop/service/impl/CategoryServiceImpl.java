@@ -73,20 +73,8 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
         if (ObjectUtil.isNotNull(id) || id > 0){
 
-
-//            CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
-//
-//            Example example1 = new Example(CategoryBrandEntity.class);
-//            example1.createCriteria().andEqualTo("brandId",categoryBrandEntity.getBrandId());
-            //如果关系表中有关系就不能删除
-//            if(categoryBrandEntity.getBrandId() != null) return this.setResultError("不可删除");
-
-
-
-
             //通过id查询当前节点信息
             CategoryEntity categoryEntity = categoryMapper.selectByPrimaryKey(id);
-
 
             //判断当前节点是否是父节点
             if (categoryEntity.getIsParent() == 1) return this.setResultError("当前节点为父节点");

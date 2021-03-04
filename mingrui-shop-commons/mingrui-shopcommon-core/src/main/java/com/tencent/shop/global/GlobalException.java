@@ -28,8 +28,8 @@ public class GlobalException {
 
     @ExceptionHandler(value = RuntimeException.class)
     public Result<JsonObject> test(RuntimeException e){
-        log.error("code:{},message:{}", HTTPStatus.PARAMS_VALIDATE_ERROR);
-        return new Result<JsonObject>(HTTPStatus.PARAMS_VALIDATE_ERROR,e.getMessage(),null);
+        log.error("code : {},message : {}", HTTPStatus.ERROR,e.getMessage());
+        return new Result<JsonObject>(HTTPStatus.ERROR,e.getMessage(),null);
     }
 
     @ExceptionHandler(value= MethodArgumentNotValidException.class)
@@ -37,20 +37,14 @@ public class GlobalException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("code",HTTPStatus.PARAMS_VALIDATE_ERROR);
         List<String> msgList = new ArrayList<>();
-        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+//        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+//            msgList.add("Field --> " + error.getField() + " : " + error.getDefaultMessage());
+//            log.error("Field --> " + error.getField() + " : " + error.getDefaultMessage());
+//        }
+        exception.getBindingResult().getFieldErrors().stream().forEach(error -> {
             msgList.add("Field --> " + error.getField() + " : " + error.getDefaultMessage());
             log.error("Field --> " + error.getField() + " : " + error.getDefaultMessage());
-        }
-//        List<Result<JsonObject>> objects = new ArrayList<>();
-//        //按需重新封装 需要返回的错误信息
-//        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
-//            Result<JsonObject> jsonObjectResult = new Result<>();
-//            jsonObjectResult.setCode(HTTPStatus.PARAMS_VALIDATE_ERROR);
-//            jsonObjectResult.setMessage("Field --> " + error.getField() + " : " + error.getDefaultMessage());
-//            log.debug("Field --> " + error.getField() + " : " + error.getDefaultMessage());
-//            objects.add(jsonObjectResult);
-//        }
-//        return objects;
+        });
         String message = msgList.parallelStream().collect(Collectors.joining(","));
         map.put("message",message);
 
