@@ -9,6 +9,7 @@ import com.tencent.shop.entity.SpecParamEntity;
 import com.tencent.shop.validate.group.MingruiOperation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +43,7 @@ public interface SpecificationService {
 
     @ApiOperation(value = "规格参数查询")
     @GetMapping(value = "specparam/list")
-    Result<List<SpecParamEntity>> list(SpecParamDTO specParamDTO);
+    Result<List<SpecParamEntity>> list(@SpringQueryMap SpecParamDTO specParamDTO);
 
     @ApiOperation(value = "规格参数新增")
     @PostMapping(value = "specparam/save")

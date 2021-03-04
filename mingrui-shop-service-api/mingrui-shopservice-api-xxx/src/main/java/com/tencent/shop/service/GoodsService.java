@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.tencent.shop.base.Result;
 import com.tencent.shop.dto.SkuDTO;
 import com.tencent.shop.dto.SpuDTO;
+import com.tencent.shop.entity.SpuDetailEntity;
 import com.tencent.shop.entity.SpuEntity;
 import com.tencent.shop.utils.JSONUtil;
 import com.tencent.shop.validate.group.MingruiOperation;
@@ -35,11 +36,11 @@ public interface GoodsService {
 
     @ApiOperation(value = "通过spuid获取spuDetail信息")
     @GetMapping(value = "goods/getSpuDetailBySpuId")
-    Result<List<SpuEntity>> getSpuDetailBySpuId(Integer spuId);
+    Result<SpuDetailEntity> getSpuDetailBySpuId(@RequestParam Integer spuId);
 
     @ApiOperation(value = "通过spuid获取sku信息")
     @GetMapping(value = "goods/getSkuBySpuId")
-    Result<List<SkuDTO>> getSkuBySpuId(Integer spuId);
+    Result<List<SkuDTO>> getSkuBySpuId(@RequestParam Integer spuId);
 
     @ApiOperation(value = "修改商品")
     @PutMapping(value = "goods/save")
