@@ -8,6 +8,7 @@ import com.tencent.shop.entity.BrandEntity;
 import com.tencent.shop.validate.group.MingruiOperation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public interface BrandService {
 
     @ApiOperation(value = "获取品牌信息")
     @GetMapping(value = "brand/list")
-    Result<PageInfo<BrandEntity>> getBrandInfo(BrandDTO brandDTO);
+    Result<PageInfo<BrandEntity>> getBrandInfo(@SpringQueryMap BrandDTO brandDTO);
 
     @ApiOperation(value = "新增品牌")
     @PostMapping(value = "brand/save")
@@ -44,4 +45,7 @@ public interface BrandService {
     @GetMapping(value = "brand/getBrandInfoByCategoryId")
     Result<PageInfo<BrandEntity>> getBrandInfoByCategoryId(Integer cid);
 
+    @ApiOperation(value="通过品牌id集合获取品牌")
+    @GetMapping(value = "brand/getBrandByIds")
+    Result<List<BrandEntity>> getBrandByIds(@RequestParam String ids);
 }

@@ -4,6 +4,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tencent.shop.base.BaseApiService;
 import com.tencent.shop.base.Result;
+import com.tencent.shop.component.MrRabbitMQ;
+import com.tencent.shop.constant.MqMessageConstant;
 import com.tencent.shop.dto.SkuDTO;
 import com.tencent.shop.dto.SpuDTO;
 import com.tencent.shop.dto.SpuDetailDTO;
@@ -15,6 +17,7 @@ import com.tencent.shop.utils.JSONUtil;
 import com.tencent.shop.utils.ObjectUtil;
 import com.tencent.shop.utils.TencentBeanUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +58,9 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Resource
     private StockMapper stockMapper;
 
+    @Autowired
+    private MrRabbitMQ mrRabbitMQ;
+
     @Override
     @Transactional
     public Result<JSONUtil> downGoods(SpuDTO spuDTO) {
@@ -77,24 +83,33 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
         //spu
         spuMapper.deleteByPrimaryKey(spuId);
-
         //spuDetail
         spuDetailMapper.deleteByPrimaryKey(spuId);
-
         Example example = new Example(SkuEntity.class);
         example.createCriteria().andEqualTo("spuId",spuId);
         List<SkuEntity> skuEntities = skuMapper.selectByExample(example);
         List<Long> skuId = skuEntities.stream().map(skuEntity -> skuEntity.getId()).collect(Collectors.toList());
         skuMapper.deleteByIdList(skuId);
         stockMapper.deleteByIdList(skuId);
-
+        mrRabbitMQ.send(spuId + "",MqMessageConstant.SPU_ROUT_KEY_DELETE);
         return this.setResultSuccess();
     }
 
+    public void deleteGoodsTransactional(){
+
+    }
+
     @Override
-    @Transactional
     public Result<JSONUtil> editGoods(SpuDTO spuDTO) {
 
+        Integer spuId = this.editGoodsTransactional(spuDTO);
+
+        mrRabbitMQ.send(spuId+"",MqMessageConstant.SPU_ROUT_KEY_UPDATE);
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    public Integer editGoodsTransactional(SpuDTO spuDTO){
         final Date date = new Date();
         //spu
         SpuEntity spuEntity = TencentBeanUtil.copyProperties(spuDTO, SpuEntity.class);
@@ -114,7 +129,7 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         stockMapper.deleteByIdList(skuId);
         this.saveSkusAndStock(spuDTO,spuEntity.getId(),date);
 
-        return this.setResultSuccess();
+        return spuEntity.getId();
     }
 
     @Override
@@ -151,6 +166,10 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
         if (!StringUtils.isEmpty(spuDTO.getTitle())){
             example.createCriteria().andLike("title","%"+spuDTO.getTitle()+"%");
+        }
+
+        if (ObjectUtil.isNotNull(spuDTO.getId())){
+            example.createCriteria().andEqualTo("id",spuDTO.getId());
         }
 
         List<SpuEntity> spuEntities = spuMapper.selectByExample(example);
@@ -197,8 +216,15 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     }
 
     @Override
-    @Transactional
     public Result<JSONUtil> saveGoods(SpuDTO spuDTO) {
+
+        Integer spuId = this.saveGoodsTransactional(spuDTO);
+        mrRabbitMQ.send(spuId+"", MqMessageConstant.SPU_ROUT_KEY_SAVE);
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    public Integer saveGoodsTransactional(SpuDTO spuDTO){
         //spu
         final Date date = new Date();
         SpuEntity spuEntity = TencentBeanUtil.copyProperties(spuDTO, SpuEntity.class);
@@ -217,7 +243,7 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         //sku
         this.saveSkusAndStock(spuDTO,spuEntity.getId(),date);
 
-        return this.setResultSuccess();
+        return spuEntity.getId();
     }
 
     private void saveSkusAndStock(SpuDTO spuDTO,Integer spuId,Date date){

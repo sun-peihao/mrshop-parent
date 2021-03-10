@@ -32,7 +32,7 @@ public interface GoodsService {
 
     @ApiOperation(value = "新增商品")
     @PostMapping(value = "goods/save")
-    Result<JSONUtil> saveGoods(@Validated({MingruiOperation.Add.class}) @RequestBody SpuDTO spuDTO);
+    Result<JSONUtil> saveGoods(@RequestBody SpuDTO spuDTO);
 
     @ApiOperation(value = "通过spuid获取spuDetail信息")
     @GetMapping(value = "goods/getSpuDetailBySpuId")
@@ -44,7 +44,7 @@ public interface GoodsService {
 
     @ApiOperation(value = "修改商品")
     @PutMapping(value = "goods/save")
-    Result<JSONUtil> editGoods(@Validated({MingruiOperation.Update.class}) @RequestBody SpuDTO spuDTO);
+    Result<JSONUtil> editGoods(@RequestBody SpuDTO spuDTO);
 
     @ApiOperation(value = "删除商品")
     @DeleteMapping(value = "goods/delete")

@@ -22,7 +22,7 @@ public class SkuDTO {
 
     @ApiModelProperty(value = "sku id",example = "1")
     @NotNull(message = "sku id不能为空",groups = {MingruiOperation.Update.class})
-    private Long skuId;
+    private Long id;
 
     @ApiModelProperty(value = "spu id",example = "1")
     @NotNull(message = "spu id不能为空",groups = {MingruiOperation.Update.class})

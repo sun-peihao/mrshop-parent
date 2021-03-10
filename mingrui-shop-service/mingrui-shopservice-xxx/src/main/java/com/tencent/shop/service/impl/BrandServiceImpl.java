@@ -11,6 +11,7 @@ import com.tencent.shop.entity.CategoryBrandEntity;
 import com.tencent.shop.mapper.BrandMapper;
 import com.tencent.shop.mapper.CategoryBrandMapper;
 import com.tencent.shop.service.BrandService;
+import com.tencent.shop.utils.ObjectUtil;
 import com.tencent.shop.utils.PinyinUtil;
 import com.tencent.shop.utils.TencentBeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,14 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     private BrandMapper brandMapper;
 
     @Override
+    public Result<List<BrandEntity>> getBrandByIds(String ids) {
+
+        List<Integer> idList = Arrays.asList(ids.split(",")).stream().map(idStr -> Integer.valueOf(idStr)).collect(Collectors.toList());
+        List<BrandEntity> brandEntities = brandMapper.selectByIdList(idList);
+        return this.setResultSuccess(brandEntities);
+    }
+
+    @Override
     public Result<PageInfo<BrandEntity>> getBrandInfoByCategoryId(Integer cid) {
 
         List<BrandEntity> list = categoryBrandMapper.getBrandInfoByCategoryId(cid);
@@ -49,9 +58,9 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
 
     @Override
     public Result<PageInfo<BrandEntity>> getBrandInfo(BrandDTO brandDTO) {
-
         //分页
-        PageHelper.startPage(brandDTO.getPage(),brandDTO.getRows());
+        if (!ObjectUtil.isNull(brandDTO.getPage()) && !ObjectUtil.isNull(brandDTO.getRows()))
+            PageHelper.startPage(brandDTO.getPage(),brandDTO.getRows());
 //        String isOrder = "asc";
         if (!StringUtils.isEmpty(brandDTO.getSort())){
 //            if (Boolean.valueOf(brandDTO.getOrder())){
@@ -63,7 +72,14 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         BrandEntity brandEntity = TencentBeanUtil.copyProperties(brandDTO, BrandEntity.class);
 
         Example example = new Example(BrandEntity.class);
-        example.createCriteria().andLike("name","%"+ brandEntity.getName() + "%");
+        Example.Criteria criteria = example.createCriteria();
+
+        if(!StringUtils.isEmpty(brandEntity.getName()))
+            criteria.andLike("name","%" + brandEntity.getName() + "%");
+
+        if(ObjectUtil.isNotNull(brandDTO.getId()))
+            criteria.andEqualTo("id",brandDTO.getId());
+
 
         List<BrandEntity> brandEntities = brandMapper.selectByExample(example);
 

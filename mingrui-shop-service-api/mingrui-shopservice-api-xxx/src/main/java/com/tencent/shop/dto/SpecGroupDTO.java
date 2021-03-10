@@ -1,6 +1,7 @@
 package com.tencent.shop.dto;
 
 import com.tencent.shop.base.BaseDTO;
+import com.tencent.shop.entity.SpecParamEntity;
 import com.tencent.shop.validate.group.MingruiOperation;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,6 +9,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @ClassName SpecGroupDTO
@@ -31,5 +33,7 @@ public class SpecGroupDTO extends BaseDTO {
     @ApiModelProperty(value = "规格组名称")
     @NotEmpty(message = "规格组名称不能为空",groups = {MingruiOperation.Add.class,MingruiOperation.Update.class})
     private String name;
+
+    private List<SpecParamEntity> specList;
 
 }
