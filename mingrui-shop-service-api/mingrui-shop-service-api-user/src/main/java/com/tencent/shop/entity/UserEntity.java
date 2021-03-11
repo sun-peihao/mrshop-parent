@@ -30,4 +30,5 @@ public class UserEntity {
 
     private String salt;
 
+
 }
